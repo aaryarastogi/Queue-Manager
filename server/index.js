@@ -20,6 +20,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req,res)=>{
+  return res.send("server is live")
+})
+
 app.post('/register', registerHandler);
 app.post("/login", loginHandler);
 
