@@ -5,6 +5,8 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors} from "
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Equal, Plus } from "lucide-react";
+import backend_url from "../config";
+import { motion } from "framer-motion";
 
 function SortableItem({ token, cancelToken }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -67,7 +69,7 @@ const QueueManager = () => {
   const fetchTokens = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/${queueId}`,
+        `${backend_url}/${queueId}`,
         authHeader
       );
       setTokens(res.data);
@@ -86,7 +88,7 @@ const QueueManager = () => {
 
     try {
       await axios.post(
-        `http://localhost:8000/${queueId}`,
+        `${backend_url}/${queueId}`,
         { customerName: newTokenName },
         authHeader
       );
@@ -101,7 +103,7 @@ const QueueManager = () => {
   const cancelToken = async (tokenId) => {
     try {
       await axios.patch(
-        `http://localhost:8000/${queueId}/${tokenId}/cancel`,
+        `${backend_url}/${queueId}/${tokenId}/cancel`,
         {},
         authHeader
       );
@@ -123,7 +125,7 @@ const QueueManager = () => {
       }
 
       await axios.post(
-        `http://localhost:8000/${queueId}/assign`,
+        `${backend_url}/${queueId}/assign`,
         { tokenId: tokenToAssign._id },
         authHeader
       );
@@ -147,7 +149,7 @@ const QueueManager = () => {
 
     try {
       await axios.post(
-        `http://localhost:8000/reorder/${queueId}`,
+        `${backend_url}/reorder/${queueId}`,
         { tokenIds: reordered.map((t) => t._id) },
         authHeader
       );
@@ -163,26 +165,40 @@ const QueueManager = () => {
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-row">
           <button
-          onClick={() => navigate('/queues')}
-          className="text-[#64748b] hover:text-[#475569] mr-4 cursor-pointer"
+            onClick={() => navigate('/queues')}
+            className="text-[#64748b] hover:text-[#475569] mr-4 cursor-pointer"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl font-bold text-[#1a1a1a] mb-2">Manage Queues</h1>
+            <p className="text-[#6b7280] text-lg">See token status and adding tokens in the queue.</p>
+          </motion.div>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 bg-[#14b8a6] hover:bg-[#0f9887] text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 shadow-lg cursor-pointer"
+          onClick={assignTopToken}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h1 className="text-4xl font-bold text-[#1a1a1a] mb-2">Manage Queues</h1>
-          <p className="text-[#6b7280] text-lg">See token status and adding tokens in the queue.</p>
-        </div>
-        </div>
-        <button className="flex items-center gap-2 bg-[#14b8a6] hover:bg-[#0f9887] text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg cursor-pointer"
-         onClick={assignTopToken}>
           <Equal className="w-5 h-5" />
           Assign Top Token
-        </button>
+        </motion.button>
       </div>
 
-      <form onSubmit={addToken} className="flex gap-2">
+      <motion.form
+        onSubmit={addToken}
+        className="flex gap-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <input
           type="text"
           placeholder="Enter person/token name"
@@ -191,13 +207,15 @@ const QueueManager = () => {
           className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           required
         />
-        <button
+        <motion.button
           type="submit"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition cursor-pointer"
         >
           Add Token
-        </button>
-      </form>
+        </motion.button>
+      </motion.form>
 
       <DndContext
         sensors={sensors}
@@ -205,18 +223,30 @@ const QueueManager = () => {
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={tokens.map((t) => t._id.toString())} 
+          items={tokens.map((t) => t._id.toString())}
           strategy={verticalListSortingStrategy}
         >
-          <ul className="space-y-3 mt-4">
+          <motion.ul
+            className="space-y-3 mt-4"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.15 },
+              },
+            }}
+          >
             {tokens.map((token) => (
-              <SortableItem
+              <motion.li
                 key={token._id.toString()}
-                token={token}
-                cancelToken={cancelToken}
-              />
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+              >
+                <SortableItem token={token} cancelToken={cancelToken} />
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         </SortableContext>
       </DndContext>
     </div>

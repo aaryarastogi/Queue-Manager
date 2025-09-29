@@ -2,6 +2,22 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import queue from "../assets/queue.png"
+import {motion} from 'framer-motion';
+import backend_url from "../config";
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { type: "spring", stiffness: 70, damping: 15, staggerChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +27,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8000/login", { email, password });
+      const res = await axios.post(`${backend_url}/login`, { email, password });
       localStorage.setItem("token", res.data.token); 
       navigate("/queues/options"); 
     } catch (err) {
@@ -21,64 +37,98 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden md:flex flex-col w-1/2 bg-blue-50 justify-center items-center">
-        <img
+    <div className="min-h-screen flex bg-gradient-to-r from-blue-50 to-teal-50">
+      {/* Left Side Image */}
+      <motion.div 
+        initial={{ opacity: 0, x: -50 }} 
+        animate={{ opacity: 1, x: 0 }} 
+        transition={{ duration: 1 }} 
+        className="hidden md:flex flex-col w-1/2 justify-center items-center"
+      >
+        <motion.img
           src={queue}
           alt="Queue Illustration"
-          className="w-3/4 h-auto"
+          className="w-3/4 h-auto drop-shadow-xl"
+          initial={{ scale: 0.8, rotate: -5 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 80, damping: 10 }}
         />
-      </div>
-      <div className="flex flex-1 justify-center items-center p-6">
-        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-2">Welcome to Queue Manager</h2>
-          <p className="text-gray-500 mb-6">
-            Unlock Your Queue Management Efficiency
-          </p>
+      </motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+      {/* Right Side Login Form */}
+      <div className="flex flex-1 justify-center items-center p-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl"
+        >
+          <motion.h2 
+            className="text-2xl font-bold mb-2 text-center text-gray-800"
+            variants={itemVariants}
+          >
+            Welcome to Queue Manager
+          </motion.h2>
+          
+          <motion.p 
+            className="text-gray-500 mb-6 text-center"
+            variants={itemVariants}
+          >
+            Unlock Your Queue Management Efficiency
+          </motion.p>
+
+          {/* Form */}
+          <motion.form onSubmit={handleSubmit} className="space-y-4">
+            <motion.div variants={itemVariants}>
               <label className="block text-gray-700 mb-1">Email address</label>
-              <input
+              <motion.input
+                whileFocus={{ scale: 1.02 }}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
                 placeholder="Enter your email"
                 required
               />
-            </div>
+            </motion.div>
 
-            <div>
+            <motion.div variants={itemVariants}>
               <label className="block text-gray-700 mb-1">Password</label>
-              <input
+              <motion.input
+                whileFocus={{ scale: 1.02 }}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
                 placeholder="Enter your password"
                 required
               />
-            </div>
+            </motion.div>
 
-            <button
+            <motion.button
               type="submit"
-              className="w-full bg-teal-600 text-white p-3 rounded-lg hover:bg-teal-700 transition cursor-pointer"
+              className="w-full bg-gradient-to-r from-teal-600 to-blue-600 text-white p-3 rounded-lg hover:opacity-90 transition cursor-pointer font-medium shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              variants={itemVariants}
             >
               Login
-            </button>
-          </form>
+            </motion.button>
+          </motion.form>
 
-          <p className="text-center text-gray-500 mt-4">
+          <motion.p 
+            className="text-center text-gray-500 mt-4"
+            variants={itemVariants}
+          >
             Don’t have an account?{" "}
             <span
               onClick={() => navigate("/signup")}
-              className="text-teal-600 cursor-pointer hover:underline"
+              className="text-teal-600 cursor-pointer hover:underline font-medium"
             >
               Register
             </span>
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );
