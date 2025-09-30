@@ -29,7 +29,7 @@ A modern, interactive **Queue Management System** built with **MERN Stack**. Thi
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/queue-manager.git
+git clone https://github.com/aaryarastogi/Queue-Manager.git
 cd queue-manager
 ```
 2. **Install Dependencies**
