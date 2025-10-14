@@ -38,7 +38,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-r from-blue-50 to-teal-50">
-      {/* Left Side Image */}
       <motion.div 
         initial={{ opacity: 0, x: -50 }} 
         animate={{ opacity: 1, x: 0 }} 
@@ -55,7 +54,6 @@ const Login = () => {
         />
       </motion.div>
 
-      {/* Right Side Login Form */}
       <div className="flex flex-1 justify-center items-center p-6">
         <motion.div
           variants={containerVariants}
